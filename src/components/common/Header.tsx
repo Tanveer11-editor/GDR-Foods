@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag, User, MapPin, ChevronDown, Clock, ShieldCheck, Heart } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { useUserStore } from '../../store/useUserStore';
+import { useCustomerAuth } from '../../store/useCustomerAuth';
 import { LocationModal } from './LocationModal';
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   const { items, toggleDrawer } = useCartStore();
   const { selectedLocationLabel, deliveryEtaLabel, wishlist } = useUserStore();
+  const { isLoggedIn, user } = useCustomerAuth();
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -117,19 +119,33 @@ export const Header: React.FC = () => {
                 )}
               </Link>
 
-              {/* Account Link */}
-              <Link
-                to="/account"
-                className="p-2.5 rounded-2xl text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors hidden sm:flex"
-                title="My Account"
-              >
-                <User className="w-5 h-5" />
-              </Link>
+              {/* Account / Login Link */}
+              {isLoggedIn ? (
+                <Link
+                  to="/account"
+                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-2 rounded-2xl text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                  title="My Account"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                    {user?.name.charAt(0) || 'U'}
+                  </div>
+                  <span className="text-xs font-bold hidden sm:inline max-w-[100px] truncate">
+                    {user?.name.split(' ')[0]}
+                  </span>
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="px-3.5 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-extrabold border border-emerald-200/80 transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
 
-              {/* Admin Button */}
+              {/* Admin Portal Button */}
               <Link
                 to="/admin"
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-100/60 hover:bg-emerald-200/60 rounded-xl transition-colors border border-emerald-300/40"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200/80 rounded-2xl transition-colors border border-slate-200/80"
               >
                 Admin
               </Link>
