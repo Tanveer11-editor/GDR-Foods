@@ -5,7 +5,7 @@ import { ShieldCheck, Truck, Clock, Award, PhoneCall, Mail, MapPin } from 'lucid
 export const Footer: React.FC = () => {
   return (
     <footer className="bg-slate-900 text-slate-300 pt-14 pb-24 md:pb-12 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Value Proposition Badges */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-12 border-b border-slate-800">
           <div className="flex items-center gap-3">

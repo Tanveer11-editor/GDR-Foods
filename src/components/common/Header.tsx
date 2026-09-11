@@ -33,9 +33,9 @@ export const Header: React.FC = () => {
           <span className="hidden md:inline text-emerald-300">| Use Code: <strong className="text-white">FRESH50</strong></span>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
           {/* Main Desktop & Tablet Navigation */}
-          <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
+          <div className="flex items-center justify-between h-16 sm:h-20 gap-3 lg:gap-5">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
               <div className="w-10 h-10 rounded-2xl bg-emerald-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-emerald-500/30 group-hover:scale-105 transition-transform">
@@ -73,26 +73,26 @@ export const Header: React.FC = () => {
               </div>
             </button>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden xl:flex items-center gap-6 text-sm font-semibold text-slate-700">
-              <Link to="/" className="hover:text-emerald-600 transition-colors">Home</Link>
-              <Link to="/category/fruits" className="hover:text-emerald-600 transition-colors">Fruits</Link>
-              <Link to="/category/vegetables" className="hover:text-emerald-600 transition-colors">Vegetables</Link>
-              <Link to="/category/dairy-eggs" className="hover:text-emerald-600 transition-colors">Dairy & Eggs</Link>
-              <Link to="/account" className="hover:text-emerald-600 transition-colors">Deals</Link>
-            </nav>
-
-            {/* Search Bar - Desktop */}
-            <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md relative">
+            {/* Search Bar - Prominent & Long */}
+            <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 min-w-[200px] max-w-xl lg:max-w-2xl xl:max-w-3xl relative">
               <input
                 type="text"
-                placeholder="Search fresh apples, organic milk, basmati..."
+                placeholder="Search fresh apples, organic milk, basmati, sourdough..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl glass-input text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
+                className="w-full pl-11 pr-4 py-2.5 rounded-2xl glass-input text-sm text-slate-800 placeholder-slate-400 focus:outline-none shadow-inner"
               />
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             </form>
+
+            {/* Desktop Navigation Links */}
+            <nav className="hidden xl:flex items-center gap-5 text-sm font-semibold text-slate-700 shrink-0">
+              <Link to="/" className="whitespace-nowrap hover:text-emerald-600 transition-colors">Home</Link>
+              <Link to="/category/fruits" className="whitespace-nowrap hover:text-emerald-600 transition-colors">Fruits</Link>
+              <Link to="/category/vegetables" className="whitespace-nowrap hover:text-emerald-600 transition-colors">Vegetables</Link>
+              <Link to="/category/dairy-eggs" className="whitespace-nowrap hover:text-emerald-600 transition-colors">Dairy & Eggs</Link>
+              <Link to="/account" className="whitespace-nowrap hover:text-emerald-600 transition-colors">Deals</Link>
+            </nav>
 
             {/* Right Action Icons */}
             <div className="flex items-center gap-2 sm:gap-3">
