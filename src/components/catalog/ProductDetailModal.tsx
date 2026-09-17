@@ -50,9 +50,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product,
       <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/50 backdrop-blur-md overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="w-full max-w-3xl glass-panel rounded-3xl p-5 sm:p-8 shadow-2xl relative border border-white/80 max-h-[90vh] overflow-y-auto no-scrollbar"
+          className="w-[94vw] sm:w-[88vw] md:w-[82vw] lg:w-full max-w-3xl glass-panel rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative border border-white/80 max-h-[92vh] overflow-y-auto no-scrollbar"
         >
           {/* Close Button */}
           <button

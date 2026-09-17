@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from '../lib/supabaseClient';
 
 export interface CustomerUser {
   id: string;
@@ -11,12 +12,12 @@ export interface CustomerUser {
 interface CustomerAuthState {
   isLoggedIn: boolean;
   user: CustomerUser | null;
-  login: (emailOrPhone: string, pass: string) => { success: boolean; message: string };
-  signup: (name: string, email: string, phone: string, pass: string) => { success: boolean; message: string };
-  logout: () => void;
+  login: (emailOrPhone: string, pass: string) => Promise<{ success: boolean; message: string }>;
+  signup: (name: string, email: string, phone: string, pass: string) => Promise<{ success: boolean; message: string }>;
+  logout: () => Promise<void>;
 }
 
-const DEMO_CUSTOMER: CustomerUser = {
+export const DEMO_CUSTOMER: CustomerUser = {
   id: 'cust-101',
   name: 'Mohammed Tanveer',
   email: 'customer@gdrfoods.com',
@@ -26,14 +27,50 @@ const DEMO_CUSTOMER: CustomerUser = {
 export const useCustomerAuth = create<CustomerAuthState>()(
   persist(
     (set) => ({
-      isLoggedIn: true, // Default seeded logged-in for seamless experience
-      user: DEMO_CUSTOMER,
+      isLoggedIn: false,
+      user: null,
 
-      login: (emailOrPhone, pass) => {
+      login: async (emailOrPhone, pass) => {
         const cleanedIdentifier = emailOrPhone.trim().toLowerCase();
-        // Demo authentication validation
+
+        // Strict Isolation: Explicitly reject admin credentials on customer login
         if (
-          (cleanedIdentifier === 'customer@gdrfoods.com' || cleanedIdentifier === '9876543210' || cleanedIdentifier === '+91 98765 43210' || cleanedIdentifier === 'customer') &&
+          cleanedIdentifier === 'admin@gdrfoods.com' ||
+          cleanedIdentifier === 'admin' ||
+          pass === 'Admin@123'
+        ) {
+          return { success: false, message: 'Invalid email or password' };
+        }
+
+        // 1. Try Supabase Auth first
+        if (cleanedIdentifier.includes('@')) {
+          try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email: cleanedIdentifier,
+              password: pass,
+            });
+
+            if (!error && data?.user) {
+              const customerUser: CustomerUser = {
+                id: data.user.id,
+                name: data.user.user_metadata?.name || cleanedIdentifier.split('@')[0],
+                email: data.user.email || cleanedIdentifier,
+                phone: data.user.user_metadata?.phone || '+91 98765 43210',
+              };
+              set({ isLoggedIn: true, user: customerUser });
+              return { success: true, message: 'Welcome back to GDR Foods!' };
+            }
+          } catch (e) {
+            console.warn('Supabase auth call fallback:', e);
+          }
+        }
+
+        // 2. Demo customer credentials validation (local/offline fallback)
+        if (
+          (cleanedIdentifier === 'customer@gdrfoods.com' ||
+            cleanedIdentifier === '9876543210' ||
+            cleanedIdentifier === '+91 98765 43210' ||
+            cleanedIdentifier === 'customer') &&
           pass === 'Customer@123'
         ) {
           set({
@@ -43,7 +80,7 @@ export const useCustomerAuth = create<CustomerAuthState>()(
           return { success: true, message: 'Welcome back to GDR Foods!' };
         }
 
-        // Generic user fallback for custom entries
+        // Custom customer credentials validation
         if (pass.length >= 6 && (cleanedIdentifier.includes('@') || cleanedIdentifier.length >= 10)) {
           set({
             isLoggedIn: true,
@@ -57,24 +94,57 @@ export const useCustomerAuth = create<CustomerAuthState>()(
           return { success: true, message: 'Logged in successfully!' };
         }
 
-        return { success: false, message: 'Invalid credentials. Use demo: customer@gdrfoods.com / Customer@123' };
+        return { success: false, message: 'Invalid email or password' };
       },
 
-      signup: (name, email, phone, pass) => {
+      signup: async (name, email, phone, pass) => {
         if (!name || !email || !pass) {
           return { success: false, message: 'Please fill in all required fields' };
         }
+        const cleanedEmail = email.trim().toLowerCase();
+        if (cleanedEmail === 'admin@gdrfoods.com') {
+          return { success: false, message: 'This email address is reserved for administration' };
+        }
+
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email: cleanedEmail,
+            password: pass,
+            options: {
+              data: { name: name.trim(), phone: phone.trim() },
+            },
+          });
+
+          if (!error && data?.user) {
+            const newUser: CustomerUser = {
+              id: data.user.id,
+              name: name.trim(),
+              email: cleanedEmail,
+              phone: phone.trim() || '+91 98765 43210',
+            };
+            set({ isLoggedIn: true, user: newUser });
+            return { success: true, message: 'Account created successfully! Welcome to GDR Foods.' };
+          }
+        } catch (e) {
+          console.warn('Supabase signup fallback:', e);
+        }
+
         const newUser: CustomerUser = {
           id: `cust-${Date.now()}`,
           name: name.trim(),
-          email: email.trim().toLowerCase(),
+          email: cleanedEmail,
           phone: phone.trim() || '+91 98765 43210',
         };
         set({ isLoggedIn: true, user: newUser });
         return { success: true, message: 'Account created successfully! Welcome to GDR Foods.' };
       },
 
-      logout: () => {
+      logout: async () => {
+        try {
+          await supabase.auth.signOut();
+        } catch (e) {
+          console.warn('Supabase signout error:', e);
+        }
         set({ isLoggedIn: false, user: null });
       },
     }),

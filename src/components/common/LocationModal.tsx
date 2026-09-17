@@ -48,7 +48,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({ isOpen, onClose })
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="w-full max-w-lg glass-panel rounded-3xl p-6 shadow-2xl relative border border-white/80"
+          className="w-[94vw] sm:w-[88vw] md:w-full max-w-lg glass-panel rounded-3xl p-4 sm:p-6 shadow-2xl relative border border-white/80 max-h-[92vh] overflow-y-auto no-scrollbar"
         >
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b border-slate-200/60">

@@ -71,7 +71,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="w-full max-w-lg glass-panel rounded-3xl p-6 shadow-2xl relative border border-white/80 max-h-[90vh] overflow-y-auto no-scrollbar"
+          className="w-[94vw] sm:w-[88vw] md:w-full max-w-lg glass-panel rounded-3xl p-4 sm:p-6 shadow-2xl relative border border-white/80 max-h-[92vh] overflow-y-auto no-scrollbar"
         >
           <div className="flex items-center justify-between pb-4 border-b border-slate-200/60 mb-4">
             <div className="flex items-center gap-2.5">

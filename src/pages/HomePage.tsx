@@ -24,33 +24,33 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-8 pb-12">
       {/* HERO SECTION — Emerald Flow Organic Motion */}
-      <section className="relative rounded-3xl overflow-hidden glass-panel-dark border border-emerald-500/30 p-6 sm:p-12 shadow-2xl text-white">
+      <section className="relative rounded-3xl overflow-hidden glass-panel-dark border border-emerald-500/30 p-5 sm:p-8 md:p-10 lg:p-12 shadow-2xl text-white">
         {/* Animated Background Orbs */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/25 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
-        <div className="absolute bottom-0 left-10 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl animate-float pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-emerald-500/25 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
+        <div className="absolute bottom-0 left-5 w-60 h-60 sm:w-80 sm:h-80 bg-teal-400/20 rounded-full blur-3xl animate-float pointer-events-none" />
 
-        <div className="relative z-10 max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/90 backdrop-blur-md border border-emerald-400/40 text-emerald-300 text-xs font-extrabold shadow-inner">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>20–30 Min Express Delivery Guaranteed</span>
+        <div className="relative z-10 max-w-2xl space-y-3.5 sm:space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-emerald-950/90 backdrop-blur-md border border-emerald-400/40 text-emerald-300 text-[11px] sm:text-xs font-extrabold shadow-inner">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="truncate">20–30 Min Express Delivery Guaranteed</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
             Freshness, delivered <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-400 drop-shadow-sm">
               straight to your door.
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-emerald-100 font-medium leading-relaxed max-w-xl">
+          <p className="text-xs sm:text-sm md:text-base text-emerald-100 font-medium leading-relaxed max-w-xl">
             Orchard-fresh fruits, hydroponic crisp vegetables, pure A2 dairy, artisan sourdough, and everyday kitchen essentials — packed cold and delivered fast.
           </p>
 
           {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-3 pt-3">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2 sm:pt-3">
             <button
               onClick={() => navigate('/search')}
-              className="btn-emerald px-6 py-3.5 rounded-2xl text-sm font-extrabold flex items-center gap-2 shadow-xl shadow-emerald-500/40"
+              className="btn-emerald px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-xl shadow-emerald-500/40"
             >
               <span>Shop Now</span>
               <ArrowRight className="w-4 h-4" />
@@ -58,7 +58,7 @@ export const HomePage: React.FC = () => {
 
             <a
               href="#fresh-picks"
-              className="px-6 py-3.5 rounded-2xl text-sm font-extrabold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 transition-all flex items-center gap-2 shadow-sm"
+              className="px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl text-xs sm:text-sm font-extrabold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/30 transition-all flex items-center gap-2 shadow-sm"
             >
               <Zap className="w-4 h-4 text-emerald-300" />
               <span>Explore Fresh Picks</span>
@@ -66,18 +66,18 @@ export const HomePage: React.FC = () => {
           </div>
 
           {/* Value Props Row */}
-          <div className="grid grid-cols-3 gap-3 pt-6 border-t border-emerald-800/80 text-xs">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-300 shrink-0" />
-              <span className="font-bold text-emerald-100">25 Min ETA</span>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 border-t border-emerald-800/80 text-[11px] sm:text-xs">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300 shrink-0" />
+              <span className="font-bold text-emerald-100 truncate">25 Min ETA</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-emerald-300 shrink-0" />
-              <span className="font-bold text-emerald-100">100% Organic</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300 shrink-0" />
+              <span className="font-bold text-emerald-100 truncate">100% Organic</span>
             </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-300 shrink-0" />
-              <span className="font-bold text-emerald-100">Quality Checked</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300 shrink-0" />
+              <span className="font-bold text-emerald-100 truncate">Quality Checked</span>
             </div>
           </div>
         </div>

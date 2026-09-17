@@ -39,7 +39,7 @@ export const AnalyticsCharts: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <div className="glass-card rounded-3xl p-4 border border-white/80">
           <div className="flex items-center justify-between text-slate-500 mb-2">
             <span className="text-xs font-bold uppercase tracking-wider">Today's Revenue</span>
@@ -96,7 +96,7 @@ export const AnalyticsCharts: React.FC = () => {
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         {/* Hourly Sales Trend Area Chart */}
         <div className="lg:col-span-2 glass-panel rounded-3xl p-5 border border-white/80">
           <div className="flex items-center justify-between mb-4">

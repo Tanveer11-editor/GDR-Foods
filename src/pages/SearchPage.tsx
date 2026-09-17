@@ -159,8 +159,8 @@ export const SearchPage: React.FC = () => {
         )}
 
         {/* Filter Bar & Sort Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200/80">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200/80 w-full min-w-0">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 max-w-full min-w-0 shrink">
             <Filter className="w-4 h-4 text-slate-400 shrink-0" />
             <button
               onClick={() => setSelectedCategory('all')}

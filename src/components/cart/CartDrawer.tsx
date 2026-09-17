@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, ArrowRight, Tag, Check, Sparkles, AlertCircle } from 'lucide-react';
@@ -7,6 +7,8 @@ import { CartItemRow } from './CartItem';
 import { FreeDeliveryBar } from './FreeDeliveryBar';
 import { EmptyState } from '../common/EmptyState';
 import { MOCK_COUPONS } from '../../data/mockCoupons';
+import { Coupon } from '../../types';
+import { supabase } from '../../lib/supabaseClient';
 
 export const CartDrawer: React.FC = () => {
   const navigate = useNavigate();
@@ -30,6 +32,30 @@ export const CartDrawer: React.FC = () => {
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
   const [showCouponsList, setShowCouponsList] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState<Coupon[]>(MOCK_COUPONS);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data, error } = await supabase.from('coupons').select('*');
+        if (!error && data && data.length > 0) {
+          const mapped: Coupon[] = data.map((c: any) => ({
+            code: c.code,
+            title: c.title,
+            description: c.description,
+            minOrder: Number(c.min_order),
+            discountValue: Number(c.discount_value),
+            discountType: c.discount_type,
+            maxDiscount: c.max_discount ? Number(c.max_discount) : undefined,
+            expiresAt: c.expires_at,
+          }));
+          setAvailableCoupons(mapped);
+        }
+      } catch (err) {
+        console.warn('Supabase coupons fetch warning:', err);
+      }
+    })();
+  }, []);
 
   if (!isDrawerOpen) return null;
 
@@ -41,12 +67,33 @@ export const CartDrawer: React.FC = () => {
   const totalSavings = getTotalSavings();
   const totalAmount = getTotalAmount();
 
-  const handleApplyCoupon = (e?: React.FormEvent, codeToApply?: string) => {
+  const handleApplyCoupon = async (e?: React.FormEvent, codeToApply?: string) => {
     if (e) e.preventDefault();
     const code = (codeToApply || couponInput).trim().toUpperCase();
     if (!code) return;
 
-    const couponObj = MOCK_COUPONS.find((c) => c.code === code);
+    let couponObj: Coupon | undefined = availableCoupons.find((c) => c.code === code);
+
+    if (!couponObj) {
+      try {
+        const { data } = await supabase.from('coupons').select('*').eq('code', code).maybeSingle();
+        if (data) {
+          couponObj = {
+            code: data.code,
+            title: data.title,
+            description: data.description,
+            minOrder: Number(data.min_order),
+            discountValue: Number(data.discount_value),
+            discountType: data.discount_type,
+            maxDiscount: data.max_discount ? Number(data.max_discount) : undefined,
+            expiresAt: data.expires_at,
+          };
+        }
+      } catch (err) {
+        console.warn('Coupon validation error:', err);
+      }
+    }
+
     if (!couponObj) {
       setCouponError('Invalid promo coupon code');
       return;
@@ -86,7 +133,7 @@ export const CartDrawer: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="w-screen max-w-md bg-slate-50/95 backdrop-blur-2xl shadow-2xl border-l border-white/80 flex flex-col justify-between"
+            className="w-screen max-w-[92vw] sm:max-w-md bg-slate-50/95 backdrop-blur-2xl shadow-2xl border-l border-white/80 flex flex-col justify-between"
           >
             {/* Drawer Header */}
             <div className="p-4 sm:p-5 glass-panel border-b border-slate-200/80 flex items-center justify-between">
@@ -164,7 +211,7 @@ export const CartDrawer: React.FC = () => {
                         </button>
                       </div>
                     ) : (
-                      <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                      <form onSubmit={(e) => handleApplyCoupon(e)} className="flex gap-2">
                         <input
                           type="text"
                           placeholder="Enter coupon (e.g. FRESH50)"
@@ -191,7 +238,7 @@ export const CartDrawer: React.FC = () => {
                     {/* Quick Available Coupons Suggestions */}
                     {showCouponsList && !appliedCoupon && (
                       <div className="mt-3 space-y-2 pt-2 border-t border-slate-200/60">
-                        {MOCK_COUPONS.map((c) => (
+                        {availableCoupons.map((c) => (
                           <div
                             key={c.code}
                             className="flex items-center justify-between p-2 rounded-xl bg-white/80 border border-slate-200/60 hover:border-emerald-300 text-xs cursor-pointer"

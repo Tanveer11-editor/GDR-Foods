@@ -18,7 +18,28 @@ import { AdminLoginPage } from './pages/AdminLoginPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminProtectedRoute } from './components/auth/AdminProtectedRoute';
 
+import { useProductStore } from './store/useProductStore';
+import { useCustomerAuth } from './store/useCustomerAuth';
+import { useCartStore } from './store/useCartStore';
+import { useUserStore } from './store/useUserStore';
+import { useOrderStore } from './store/useOrderStore';
+
 export const App: React.FC = () => {
+  const { fetchProducts } = useProductStore();
+  const { user, isLoggedIn } = useCustomerAuth();
+  const { syncWithSupabase: syncCart } = useCartStore();
+  const { fetchUserData } = useUserStore();
+  const { fetchOrders } = useOrderStore();
+
+  React.useEffect(() => {
+    fetchProducts();
+    if (isLoggedIn && user?.id) {
+      syncCart(user.id);
+      fetchUserData(user.id);
+      fetchOrders(user.id);
+    }
+  }, [isLoggedIn, user?.id]);
+
   return (
     <Router>
       <ToastProvider>
@@ -75,6 +96,14 @@ export const App: React.FC = () => {
               {/* Admin Protected Routes */}
               <Route
                 path="/admin"
+                element={
+                  <AdminProtectedRoute>
+                    <AdminDashboardPage />
+                  </AdminProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/*"
                 element={
                   <AdminProtectedRoute>
                     <AdminDashboardPage />

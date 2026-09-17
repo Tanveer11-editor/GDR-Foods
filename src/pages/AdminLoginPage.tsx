@@ -22,13 +22,13 @@ export const AdminLoginPage: React.FC = () => {
     showToast('Demo admin credentials auto-filled', 'info');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsLoading(true);
 
-    setTimeout(() => {
-      const res = adminLogin(username, password);
+    try {
+      const res = await adminLogin(username, password);
       setIsLoading(false);
       if (res.success) {
         showToast(res.message, 'success');
@@ -36,7 +36,10 @@ export const AdminLoginPage: React.FC = () => {
       } else {
         setErrorMsg(res.message);
       }
-    }, 600);
+    } catch (err) {
+      setIsLoading(false);
+      setErrorMsg('An unexpected authentication error occurred.');
+    }
   };
 
   return (
@@ -130,7 +133,7 @@ export const AdminLoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full btn-emerald py-3.5 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20"
+            className="w-full btn-emerald py-3.5 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

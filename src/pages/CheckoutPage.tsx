@@ -4,12 +4,14 @@ import { ArrowLeft, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { useUserStore } from '../store/useUserStore';
 import { useOrderStore } from '../store/useOrderStore';
+import { useCustomerAuth } from '../store/useCustomerAuth';
 import { AddressSelector } from '../components/checkout/AddressSelector';
 import { DeliverySelector } from '../components/checkout/DeliverySelector';
 import { PaymentSelector } from '../components/checkout/PaymentSelector';
 
 export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useCustomerAuth();
   const {
     items,
     appliedCoupon,
@@ -57,20 +59,23 @@ export const CheckoutPage: React.FC = () => {
     setIsPlacing(true);
 
     setTimeout(() => {
-      const order = createOrder({
-        items,
-        subtotal,
-        discount: itemDiscount + couponDiscount,
-        deliveryFee,
-        platformFee,
-        totalAmount,
-        couponCode: appliedCoupon?.code,
-        address: selectedAddress,
-        paymentMethod,
-        paymentStatus: paymentMethod.includes('Cash') ? 'Cash on Delivery' : 'Paid',
-      });
+      const order = createOrder(
+        {
+          items,
+          subtotal,
+          discount: itemDiscount + couponDiscount,
+          deliveryFee,
+          platformFee,
+          totalAmount,
+          couponCode: appliedCoupon?.code,
+          address: selectedAddress,
+          paymentMethod,
+          paymentStatus: paymentMethod.includes('Cash') ? 'Cash on Delivery' : 'Paid',
+        },
+        user?.id || 'cust-101'
+      );
 
-      clearCart();
+      clearCart(user?.id);
       setIsPlacing(false);
       navigate(`/order-success/${order.id}`);
     }, 800);
@@ -94,9 +99,9 @@ export const CheckoutPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         {/* Left Column: Steps 1, 2 & 3 */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="md:col-span-2 space-y-4 sm:space-y-6">
           {/* Step 1: Address Selection */}
           <div className="glass-panel rounded-3xl p-5 sm:p-6 border border-white/80">
             <AddressSelector />

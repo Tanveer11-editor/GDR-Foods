@@ -95,25 +95,25 @@ export const Header: React.FC = () => {
             </nav>
 
             {/* Right Action Icons */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Location Switcher for Mobile/Tablet */}
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+              {/* Location Switcher for Mobile */}
               <button
                 onClick={() => setIsLocationModalOpen(true)}
-                className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/60"
+                className="lg:hidden flex items-center gap-1 px-2 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200/60 max-w-[120px]"
               >
-                <MapPin className="w-3.5 h-3.5" />
-                <span className="max-w-[90px] truncate">{deliveryEtaLabel}</span>
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate text-[11px]">{deliveryEtaLabel}</span>
               </button>
 
               {/* Wishlist Link */}
               <Link
                 to="/account?tab=wishlist"
-                className="relative p-2.5 rounded-2xl text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                className="relative p-2 sm:p-2.5 rounded-2xl text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors hidden sm:flex"
                 title="Wishlist"
               >
-                <Heart className="w-5 h-5" />
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
                 {wishlist.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {wishlist.length}
                   </span>
                 )}
@@ -123,20 +123,20 @@ export const Header: React.FC = () => {
               {isLoggedIn ? (
                 <Link
                   to="/account"
-                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-2 rounded-2xl text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                  className="flex items-center gap-1.5 p-1 sm:px-3 sm:py-2 rounded-2xl text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
                   title="My Account"
                 >
-                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-sm shrink-0">
                     {user?.name.charAt(0) || 'U'}
                   </div>
-                  <span className="text-xs font-bold hidden sm:inline max-w-[100px] truncate">
+                  <span className="text-xs font-bold hidden md:inline max-w-[90px] truncate">
                     {user?.name.split(' ')[0]}
                   </span>
                 </Link>
               ) : (
                 <Link
                   to="/login"
-                  className="px-3.5 py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-extrabold border border-emerald-200/80 transition-colors"
+                  className="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-extrabold border border-emerald-200/80 transition-colors"
                 >
                   Sign In
                 </Link>
@@ -145,7 +145,7 @@ export const Header: React.FC = () => {
               {/* Admin Portal Button */}
               <Link
                 to="/admin"
-                className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200/80 rounded-2xl transition-colors border border-slate-200/80"
+                className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 hover:text-emerald-700 bg-slate-100 hover:bg-slate-200/80 rounded-2xl transition-colors border border-slate-200/80 shrink-0"
               >
                 Admin
               </Link>
@@ -153,12 +153,12 @@ export const Header: React.FC = () => {
               {/* Cart Drawer Trigger Button */}
               <button
                 onClick={toggleDrawer}
-                className="relative btn-emerald px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl flex items-center gap-2 shrink-0"
+                className="relative btn-emerald px-2.5 py-1.5 sm:px-4 sm:py-2.5 rounded-2xl flex items-center gap-1.5 shrink-0"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span className="hidden sm:inline text-xs sm:text-sm font-bold">Cart</span>
                 {cartItemCount > 0 && (
-                  <span className="bg-white text-emerald-700 text-xs font-extrabold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                  <span className="bg-white text-emerald-700 text-xs font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                     {cartItemCount}
                   </span>
                 )}
@@ -174,9 +174,9 @@ export const Header: React.FC = () => {
                 placeholder="Search fresh veggies, fruits, snacks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-2xl glass-input text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
+                className="w-full pl-9 pr-4 py-2 rounded-2xl glass-input text-xs text-slate-800 placeholder-slate-400 focus:outline-none box-border"
               />
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             </form>
           </div>
         </div>

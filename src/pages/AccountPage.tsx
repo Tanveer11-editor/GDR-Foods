@@ -87,10 +87,10 @@ export const AccountPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Left Tabs Menu */}
-        <div className="lg:col-span-1 glass-panel rounded-3xl p-4 border border-white/80 space-y-1">
+        <div className="lg:col-span-1 glass-panel rounded-3xl p-3 sm:p-4 border border-white/80 flex flex-row lg:flex-col overflow-x-auto no-scrollbar gap-1.5 lg:gap-1 space-y-0 lg:space-y-1">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left ${
+            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 whitespace-nowrap ${
               activeTab === 'profile' ? 'btn-emerald shadow-md' : 'text-slate-600 hover:bg-white'
             }`}
           >
@@ -100,33 +100,33 @@ export const AccountPage: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('orders')}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left ${
+            className={`flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 whitespace-nowrap ${
               activeTab === 'orders' ? 'btn-emerald shadow-md' : 'text-slate-600 hover:bg-white'
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <ShoppingBag className="w-4 h-4" />
               <span>My Orders</span>
             </div>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20">{orders.length}</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 ml-1">{orders.length}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('wishlist')}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left ${
+            className={`flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 whitespace-nowrap ${
               activeTab === 'wishlist' ? 'btn-emerald shadow-md' : 'text-slate-600 hover:bg-white'
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <Heart className="w-4 h-4" />
               <span>Saved Wishlist</span>
             </div>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20">{wishlist.length}</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 ml-1">{wishlist.length}</span>
           </button>
 
           <button
             onClick={() => setActiveTab('addresses')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left ${
+            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 whitespace-nowrap ${
               activeTab === 'addresses' ? 'btn-emerald shadow-md' : 'text-slate-600 hover:bg-white'
             }`}
           >
@@ -136,7 +136,7 @@ export const AccountPage: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('coupons')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left ${
+            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 whitespace-nowrap ${
               activeTab === 'coupons' ? 'btn-emerald shadow-md' : 'text-slate-600 hover:bg-white'
             }`}
           >
@@ -146,7 +146,7 @@ export const AccountPage: React.FC = () => {
 
           <button
             onClick={() => setActiveTab('help')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left ${
+            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all text-left shrink-0 whitespace-nowrap ${
               activeTab === 'help' ? 'btn-emerald shadow-md' : 'text-slate-600 hover:bg-white'
             }`}
           >
@@ -159,7 +159,7 @@ export const AccountPage: React.FC = () => {
               logout();
               showToast('Signed out of GDR Foods account', 'info');
             }}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors border border-rose-200/60 text-left mt-2"
+            className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors border border-rose-200/60 text-left shrink-0 whitespace-nowrap lg:mt-2"
           >
             <LogOut className="w-4 h-4 text-rose-600" />
             <span>Sign Out</span>

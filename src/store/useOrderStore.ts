@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Order, OrderStatus, TrackingStep, CartItem, Address } from '../types';
+import { supabase } from '../lib/supabaseClient';
 
 interface OrderState {
   orders: Order[];
   activeOrderId: string | null;
 
+  fetchOrders: (customerId?: string) => Promise<void>;
   createOrder: (data: {
     items: CartItem[];
     subtotal: number;
@@ -17,7 +19,7 @@ interface OrderState {
     address: Address;
     paymentMethod: string;
     paymentStatus: 'Paid' | 'Pending' | 'Cash on Delivery';
-  }) => Order;
+  }, customerId?: string) => Order;
 
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   getOrderById: (orderId: string) => Order | undefined;
@@ -66,7 +68,7 @@ const buildTrackingSteps = (currentStatus: OrderStatus): TrackingStep[] => {
     Delivered: 4,
   };
 
-  const currentIndex = orderIndexMap[currentStatus];
+  const currentIndex = orderIndexMap[currentStatus] ?? 0;
 
   return statuses.map((s, index) => ({
     ...s,
@@ -147,7 +149,39 @@ export const useOrderStore = create<OrderState>()(
       orders: [INITIAL_MOCK_ORDER],
       activeOrderId: 'GDR-20260910-001',
 
-      createOrder: (data) => {
+      fetchOrders: async (customerId) => {
+        try {
+          let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+          if (customerId) {
+            query = query.eq('customer_id', customerId);
+          }
+          const { data, error } = await query;
+          if (!error && data && data.length > 0) {
+            const mappedOrders: Order[] = data.map((o: any) => ({
+              id: o.id,
+              items: o.items || [],
+              subtotal: Number(o.subtotal),
+              discount: Number(o.discount),
+              deliveryFee: Number(o.delivery_fee),
+              platformFee: Number(o.platform_fee),
+              totalAmount: Number(o.total_amount),
+              couponCode: o.coupon_code,
+              address: o.address,
+              paymentMethod: o.payment_method,
+              paymentStatus: o.payment_status,
+              status: o.status,
+              estimatedDelivery: o.estimated_delivery,
+              createdAt: o.created_at,
+              trackingSteps: buildTrackingSteps(o.status),
+            }));
+            set({ orders: mappedOrders });
+          }
+        } catch (e) {
+          console.warn('Orders Supabase sync warning:', e);
+        }
+      },
+
+      createOrder: (data, customerId = 'cust-101') => {
         const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         const randomNum = Math.floor(100 + Math.random() * 900);
         const orderId = `GDR-${todayStr}-${randomNum}`;
@@ -161,15 +195,44 @@ export const useOrderStore = create<OrderState>()(
           trackingSteps: buildTrackingSteps('Confirmed'),
         };
 
+        // Optimistic UI update
         set((state) => ({
           orders: [newOrder, ...state.orders],
           activeOrderId: newOrder.id,
         }));
 
+        // Background sync to Supabase
+        (async () => {
+          try {
+            await supabase.from('orders').insert([{
+              id: newOrder.id,
+              customer_id: customerId,
+              items: newOrder.items,
+              subtotal: newOrder.subtotal,
+              discount: newOrder.discount,
+              delivery_fee: newOrder.deliveryFee,
+              platform_fee: newOrder.platformFee,
+              total_amount: newOrder.totalAmount,
+              coupon_code: newOrder.couponCode,
+              address: newOrder.address,
+              payment_method: newOrder.paymentMethod,
+              payment_status: newOrder.paymentStatus,
+              status: newOrder.status,
+              estimated_delivery: newOrder.estimatedDelivery,
+              created_at: newOrder.createdAt,
+            }]);
+          } catch (e) {
+            console.warn('Supabase create order error:', e);
+          }
+        })();
+
         return newOrder;
       },
 
       updateOrderStatus: (orderId, newStatus) => {
+        const estDelivery = newStatus === 'Delivered' ? 'Delivered successfully' : 'Arriving in 15 mins';
+
+        // Optimistic UI update
         set((state) => ({
           orders: state.orders.map((order) => {
             if (order.id === orderId) {
@@ -177,12 +240,23 @@ export const useOrderStore = create<OrderState>()(
                 ...order,
                 status: newStatus,
                 trackingSteps: buildTrackingSteps(newStatus),
-                estimatedDelivery: newStatus === 'Delivered' ? 'Delivered successfully' : 'Arriving in 15 mins',
+                estimatedDelivery: estDelivery,
               };
             }
             return order;
           }),
         }));
+
+        // Background sync to Supabase
+        (async () => {
+          try {
+            await supabase.from('orders')
+              .update({ status: newStatus, estimated_delivery: estDelivery })
+              .eq('id', orderId);
+          } catch (e) {
+            console.warn('Supabase update order status error:', e);
+          }
+        })();
       },
 
       getOrderById: (orderId) => {

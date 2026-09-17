@@ -27,7 +27,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, setActive
   ];
 
   return (
-    <aside className="w-full lg:w-64 glass-panel rounded-3xl p-4 sm:p-5 flex flex-col justify-between shrink-0 border border-white/80">
+    <aside className="w-full md:w-56 lg:w-64 glass-panel rounded-3xl p-4 sm:p-5 flex flex-col justify-between shrink-0 border border-white/80">
       <div>
         {/* Header */}
         <div className="pb-4 mb-4 border-b border-slate-200/80 flex items-center justify-between">

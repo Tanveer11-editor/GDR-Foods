@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Product, CartItem, Coupon } from '../types';
+import { supabase } from '../lib/supabaseClient';
 
 interface CartState {
   items: CartItem[];
@@ -8,10 +9,11 @@ interface CartState {
   isDrawerOpen: boolean;
   
   // Actions
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
+  syncWithSupabase: (customerId: string) => Promise<void>;
+  addItem: (product: Product, quantity?: number, customerId?: string) => void;
+  removeItem: (productId: string, customerId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, customerId?: string) => void;
+  clearCart: (customerId?: string) => void;
   applyCoupon: (coupon: Coupon) => { success: boolean; message: string };
   removeCoupon: () => void;
   toggleDrawer: () => void;
@@ -41,7 +43,44 @@ export const useCartStore = create<CartState>()(
       appliedCoupon: null,
       isDrawerOpen: false,
 
-      addItem: (product, quantity = 1) => {
+      syncWithSupabase: async (customerId) => {
+        if (!customerId) return;
+        try {
+          const { data, error } = await supabase
+            .from('cart_items')
+            .select('product_id, quantity, products(*)')
+            .eq('customer_id', customerId);
+
+          if (!error && data) {
+            const remoteItems: CartItem[] = data.map((row: any) => ({
+              product: row.products ? {
+                id: row.products.id,
+                name: row.products.name,
+                category: row.products.category,
+                image: row.products.image,
+                description: row.products.description,
+                weight: row.products.weight,
+                price: Number(row.products.price),
+                mrp: Number(row.products.mrp),
+                discount: Number(row.products.discount),
+                stock: Number(row.products.stock),
+                rating: Number(row.products.rating),
+                reviewsCount: Number(row.products.reviews_count || 0),
+                brand: row.products.brand,
+                tags: row.products.tags || [],
+              } : { id: row.product_id, name: 'Product', price: 0, mrp: 0, category: 'General', image: '', description: '', weight: '', discount: 0, stock: 0, rating: 5, reviewsCount: 0, brand: 'GDR', tags: [] },
+              quantity: row.quantity,
+            }));
+            if (remoteItems.length > 0) {
+              set({ items: remoteItems });
+            }
+          }
+        } catch (e) {
+          console.warn('Cart Supabase sync warning:', e);
+        }
+      },
+
+      addItem: (product, quantity = 1, customerId) => {
         set((state) => {
           const existingIndex = state.items.findIndex((i) => i.product.id === product.id);
           if (existingIndex > -1) {
@@ -52,17 +91,44 @@ export const useCartStore = create<CartState>()(
             return { items: [...state.items, { product, quantity }] };
           }
         });
+
+        if (customerId) {
+          (async () => {
+            try {
+              const currentItem = get().items.find((i) => i.product.id === product.id);
+              const totalQty = currentItem ? currentItem.quantity : quantity;
+              await supabase
+                .from('cart_items')
+                .upsert({ customer_id: customerId, product_id: product.id, quantity: totalQty });
+            } catch (e) {
+              console.warn('Supabase cart insert error:', e);
+            }
+          })();
+        }
       },
 
-      removeItem: (productId) => {
+      removeItem: (productId, customerId) => {
         set((state) => ({
           items: state.items.filter((i) => i.product.id !== productId),
         }));
+
+        if (customerId) {
+          (async () => {
+            try {
+              await supabase
+                .from('cart_items')
+                .delete()
+                .match({ customer_id: customerId, product_id: productId });
+            } catch (e) {
+              console.warn('Supabase cart delete error:', e);
+            }
+          })();
+        }
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, quantity, customerId) => {
         if (quantity <= 0) {
-          get().removeItem(productId);
+          get().removeItem(productId, customerId);
           return;
         }
         set((state) => ({
@@ -70,9 +136,36 @@ export const useCartStore = create<CartState>()(
             i.product.id === productId ? { ...i, quantity } : i
           ),
         }));
+
+        if (customerId) {
+          (async () => {
+            try {
+              await supabase
+                .from('cart_items')
+                .update({ quantity })
+                .match({ customer_id: customerId, product_id: productId });
+            } catch (e) {
+              console.warn('Supabase cart update error:', e);
+            }
+          })();
+        }
       },
 
-      clearCart: () => set({ items: [], appliedCoupon: null }),
+      clearCart: (customerId) => {
+        set({ items: [], appliedCoupon: null });
+        if (customerId) {
+          (async () => {
+            try {
+              await supabase
+                .from('cart_items')
+                .delete()
+                .eq('customer_id', customerId);
+            } catch (e) {
+              console.warn('Supabase cart clear error:', e);
+            }
+          })();
+        }
+      },
 
       applyCoupon: (coupon) => {
         const subtotal = get().getSubtotal();
@@ -94,11 +187,11 @@ export const useCartStore = create<CartState>()(
       setDrawerOpen: (isOpen) => set({ isDrawerOpen: isOpen }),
 
       getSubtotal: () => {
-        return get().items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        return get().items.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0);
       },
 
       getMrpTotal: () => {
-        return get().items.reduce((sum, item) => sum + item.product.mrp * item.quantity, 0);
+        return get().items.reduce((sum, item) => sum + (item.product?.mrp || item.product?.price || 0) * item.quantity, 0);
       },
 
       getItemDiscount: () => {

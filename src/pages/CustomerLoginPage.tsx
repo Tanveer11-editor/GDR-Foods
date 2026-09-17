@@ -33,14 +33,14 @@ export const CustomerLoginPage: React.FC = () => {
     showToast('Demo customer credentials auto-filled', 'info');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
       if (mode === 'login') {
-        const res = login(identifier, password);
+        const res = await login(identifier, password);
         setIsLoading(false);
         if (res.success) {
           showToast(res.message, 'success');
@@ -49,7 +49,7 @@ export const CustomerLoginPage: React.FC = () => {
           setErrorMsg(res.message);
         }
       } else {
-        const res = signup(signupName, signupEmail, signupPhone, signupPassword);
+        const res = await signup(signupName, signupEmail, signupPhone, signupPassword);
         setIsLoading(false);
         if (res.success) {
           showToast(res.message, 'success');
@@ -58,7 +58,10 @@ export const CustomerLoginPage: React.FC = () => {
           setErrorMsg(res.message);
         }
       }
-    }, 600);
+    } catch (err) {
+      setIsLoading(false);
+      setErrorMsg('An unexpected error occurred during authentication.');
+    }
   };
 
   return (
@@ -243,7 +246,7 @@ export const CustomerLoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full btn-emerald py-3.5 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/30"
+            className="w-full btn-emerald py-3.5 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-xl shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

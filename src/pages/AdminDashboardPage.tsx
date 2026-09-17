@@ -35,7 +35,7 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 pb-16">
+    <div className="flex flex-col md:flex-row gap-4 sm:gap-6 pb-16">
       {/* Admin Sidebar */}
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
